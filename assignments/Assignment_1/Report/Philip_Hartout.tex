@@ -1,0 +1,67 @@
+\documentclass[a4paper,10pt,twoside]{article}
+\usepackage{bera}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[T1]{fontenc}
+\usepackage[utf8x]{inputenc}
+\usepackage[english]{babel} 
+\usepackage[usenames,dvipsnames,figures]{xcolor}
+\usepackage{lmodern,tikz,makeidx,graphicx,eurosym,amsmath,comment,titlesec,subcaption,textgreek,multirow,hyperref,url,enumerate,chemfig,sectsty,mathrsfs,amssymb,amsthm,multicol,fancyhdr,setspace,indentfirst,multicol,gensymb,textcomp}
+\usepackage[neverdecrease]{paralist}
+\usepackage[authoryear]{natbib}
+\usepackage[autostyle]{csquotes}  
+\usepackage[final]{pdfpages}
+\usepackage[top=3cm, bottom=3cm, left=3cm, right=3cm]{geometry}
+
+\hypersetup{
+    colorlinks=false,       % false: boxed links; true: colored links
+    linkcolor=black,          % color of internal links (change box color with linkbordercolor)
+    citecolor=black,        % color of links to bibliography
+    filecolor=black,      % color of file links
+    urlcolor=black           % color of external links
+}
+
+\setlength\columnsep{26pt}
+
+\pagestyle{fancy}
+\setlength{\headheight}{25pt} 
+\lhead{\textbf{Philip Hartout}}
+\rhead{\textbf{Assignment I report}}
+\rfoot{}
+
+\setlength\columnsep{26pt}
+
+\hypersetup{
+        linkcolor=blue,  
+        colorlinks=true,
+        citecolor=blue,   
+        urlcolor=blue,
+}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} 
+\newlength{\drop}
+
+\title{Computational Biology \\ Assignment I - Report}
+\author{Philip Hartout}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section*{Theory questions}
+
+\begin{enumerate}
+    \item \textbf{Why are gaps more penalized than mismatches?} Insertions and deletions happen more frequently than substitutions, and silent mutations have no impact on the functional aspects of a protein, which therefore encourages penalizing mismatches less than gaps.
+    
+    \item \textbf{Why does it make sense to disallow gaps at the start and end of a local alignment, considering the -2 score for a gap?}
+    When making a local alignment, the localization of the alignment and the score are the most important factors. Adding gaps before and after the alignment makes the score and the localization both less relevant and the score lower, therefore it makes sens to disallow gaps at the start and end of the alignment.  
+
+    \item \textbf{What is a potential problem that could arise when trying to locally align a very short sequence to a much longer one?} The overall probability of a match will inexorably increase, and the match can become meaningless as the shorter sequence can match multiple parts of the much longer one (e.g. when there are multiple repeats in the DNA sequence).
+ 
+    \item \textbf{There are $\sum_{k=0}^{n}{m+k \choose k}{m \choose m+k-n}$ possible alignments for two sequences of lengths $m$ and $n$, $m \geq n$. For sequences of lengths $m = n = 100$, this amounts to
+    $2.05 × 10^{75}$ possible alignments. Give a rough estimate — order of magnitude only — for the number of steps needed to align two sequences of this length using the Needleman-Wunsch algorithm. (Hint: consider the maximum number of iterations of the loops in the pseudocode.) For sequences of lengths $m = n = 100$, roughly how many times less than exhaustive search is this?} The computational complexity (number of steps) of the Needleman-Wunsch algorithm is in the order of $O(mn)$.
+    Since the computational complexity of the bruteforce operation is in the order of $10^{75}$ and that the  computational complexity of the Needleman-Wunsh algorithm for two sequences of length 100 is $100\cdot 100=10^4$, there is a roughly $10^{71}$ less operations to perform.
+    \item \textbf{How could you extend the Needleman-Wunsch algorithm to $k$ sequences, $k > 2$?} One could align sequences to a reference (or consensus) sequence and score each individual alignment. Adding an additional dimension for the score and path matrix for every additional sequence that needs to be compared could also be a way to extend the N-W algorithm for $k>2$.  
+\end{enumerate}
+
+\end{document}

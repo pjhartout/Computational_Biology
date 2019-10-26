@@ -1,0 +1,61 @@
+\documentclass[a4paper,10pt,twoside]{article}
+\usepackage{bera}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[T1]{fontenc}
+\usepackage[utf8x]{inputenc}
+\usepackage[english]{babel} 
+\usepackage[usenames,dvipsnames,figures]{xcolor}
+\usepackage{lmodern,tikz,makeidx,graphicx,eurosym,amsmath,comment,titlesec,subcaption,textgreek,multirow,hyperref,url,enumerate,chemfig,sectsty,mathrsfs,amssymb,amsthm,multicol,fancyhdr,setspace,indentfirst,multicol,gensymb,textcomp, booktabs}
+\usepackage[neverdecrease]{paralist}
+\usepackage[final]{pdfpages}
+\usepackage[top=3cm, bottom=3cm, left=3cm, right=3cm]{geometry}
+
+\hypersetup{
+    colorlinks=false,       % false: boxed links; true: colored links
+    linkcolor=black,          % color of internal links (change box color with linkbordercolor)
+    citecolor=black,        % color of links to bibliography
+    filecolor=black,      % color of file links
+    urlcolor=black           % color of external links
+}
+
+\setlength\columnsep{26pt}
+
+\pagestyle{fancy}
+\setlength{\headheight}{25pt} 
+\lhead{Philip Hartout}
+\rhead{Computational Biology Assignment 2}
+\rfoot{}
+
+\setlength\columnsep{26pt}
+
+\hypersetup{
+        linkcolor=blue,  
+        colorlinks=true,
+        citecolor=blue,   
+        urlcolor=black,
+}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} 
+\newlength{\drop}
+
+
+\title{Computational Biology \\ Assignment 2 - Report}
+\author{Philip Hartout \\ \url{phartout@student.ethz.ch}}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{enumerate}
+    \item  I would expect the distribution of nucleotides not to change much given that the rate of change is slow. 
+    \item  In that case, I expect the distribution of the nucleotides to approach the distribution of the equilibrium frequencies.
+    \item  We see that each row of the transition matrix $Q$ approaches the initial nucleotide distribution $\pi$ after approximately 600 mya. 
+    \item  For a nucleotide $i$, randomly sampling from the exponential distribution with rate $\lambda = -q_{ii}$.
+    \item  One could use the rate of change of each probability given nucleotide $i$ where each probability is given by:
+    \begin{equation*}
+        \left(\frac{\alpha}{\sum_{i\in\alpha\beta\gamma} i};\frac{\beta}{\sum_{i\in\alpha\beta\gamma} i};\frac{\gamma}{\sum_{i\in\alpha\beta\gamma} i}\right)
+    \end{equation*}
+\end{enumerate}
+
+\end{document}
