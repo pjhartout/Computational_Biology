@@ -166,34 +166,3 @@ for (i in 1:9) {
   print(t)
   get_evolved_sequence(sequence, t, Q)
 }
-
-# library (stringr)
-# emprical_pi = c(0,0,0,0)
-# continue = F
-  # x = 100 
-# within_range = c(F, F, F, F)
-# while (continue == F) {
-#   result = test_simulation(x)
-#   T_freq = str_count(result$human, "T")/nchar(result$human)
-#   C_freq = str_count(result$human, "C")/nchar(result$human)
-#   A_freq = str_count(result$human, "A")/nchar(result$human)
-#   G_freq = str_count(result$human, "G")/nchar(result$human)
-#   empirical_pi = c(T_freq, C_freq, A_freq, G_freq)
-#   within_range_2 = c(F, F, F, F)
-#   for (element in 1:length(emprical_pi)) {
-#     upper_bound = pi[element]+10e-4
-#     lower_bound = pi[element]-10e-4 
-#     if (empirical_pi[element] > lower_bound & empirical_pi[element] < upper_bound) {
-#       within_range[element] = T
-#       within_range_2[element] = T
-#     } 
-#   }
-#   x = x + 100
-#   print(within_range_2)
-#   print(x)
-#   print(within_range)
-#   if (all(within_range) == T){
-#     continue = T
-#   }
-# }
-# print(x)
