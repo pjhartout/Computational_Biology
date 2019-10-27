@@ -1,5 +1,5 @@
-tests_dir <- "~/Dropbox/ETHZ/Semester_1/Computational_Biology/Assignments/Assignment_2/student_test_suite/"
-if(tests_dir == "~/Dropbox/ETHZ/Semester_1/Computational_Biology/Assignments/Assignment_2/run_tests.R") stop("tests_dir needs to be set to a proper path")
+tests_dir <- "~/Dropbox/ETHZ/Semester_1/Computational_Biology/assignments/assignment_2/student_test_suite/"
+if(tests_dir == "~/Dropbox/ETHZ/Semester_1/Computational_Biology/assignments/assignment_2/run_tests.R") stop("tests_dir needs to be set to a proper path")
 
 library("RUnit")
 
