@@ -48,14 +48,11 @@
 \maketitle
 
 \begin{enumerate}
-    \item  I would expect the distribution of nucleotides not to change much given that the rate of change is slow. 
-    \item  In that case, I expect the distribution of the nucleotides to approach the distribution of the equilibrium frequencies.
+    \item  I would expect the distribution of nucleotides not to change much given that the rate of change is slow compared to the time scale of the tree. 
+    \item  In that case, I expect the distribution of the nucleotides to approach the distribution of the equilibrium frequencies (0.25 for each nucleotide if there is no particular selective pressure) given the rate of change is fast relative to the size of the tree.
     \item  We see that each row of the transition matrix $Q$ approaches the initial nucleotide distribution $\pi$ after approximately 600 mya. 
-    \item  For a nucleotide $i$, randomly sampling from the exponential distribution with rate $\lambda = -q_{ii}$.
-    \item  One could use the rate of change of each probability given nucleotide $i$ where each probability is given by:
-    \begin{equation*}
-        \left(\frac{\alpha}{\sum_{i\in\alpha\beta\gamma} i};\frac{\beta}{\sum_{i\in\alpha\beta\gamma} i};\frac{\gamma}{\sum_{i\in\alpha\beta\gamma} i}\right)
-    \end{equation*}
+    \item  For a nucleotide $i$, randomly sampling from the exponential distribution with rate $\lambda = -q_{ii}$ gives the time until the next substitution event.
+    \item  Sample from uniform distribution from $0$ until $1-q_{ii}$, then given transition probabilities provided in $Q$, determine the interval in which the sample drawn ends up in, and derive the nucleotide name. 
 \end{enumerate}
 
 \end{document}
