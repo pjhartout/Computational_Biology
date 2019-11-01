@@ -107,22 +107,18 @@ add_new_node = function(node_description, merging_nodes) {
 #########################################################
 
 get_hamming_distance = function(sequence1, sequence2) {
-    # Compute the Hamming distance between two sequences.
-    #    sequence1: first sequence 
-    #    sequence2: second sequence
+  # Compute the Hamming distance between two sequences.
+  #    sequence1: first sequence 
+  #    sequence2: second sequence
   
-    sequence1 = strsplit(sequence1, "")[[1]]
-    sequence2 = strsplit(sequence2, "")[[1]]
-    
-    distance = 0
-    for (i in nchar(sequence1)) {
-      if (substr(sequence1, i,i) != substr(sequence2, i,i)) {
-        distance = distance + 1
-      }
+  distance = 0
+  for (i in seq(nchar(sequence1))) {
+    if (substr(sequence1, i,i) != substr(sequence2, i,i)) {
+      distance = distance + 1
     }
-    
-    # Return the numerical value of the distance
-    return(distance)
+  }
+  # Return the numerical value of the distance
+  return(distance)
 }
 
 get_JC69_distance = function(sequence1, sequence2) {
@@ -130,7 +126,7 @@ get_JC69_distance = function(sequence1, sequence2) {
     #    sequence1: first sequence
     #    sequence2: second sequence
 
-    distance = -(3/4)*log(1-(3/4)*(get_hamming_distance(sequence1 = sequence1, sequence2 = sequence2)/nchar(sequence1)))
+    distance = -(3/4)*log(1-(4/3)*(get_hamming_distance(sequence1 = sequence1, sequence2 = sequence2)/nchar(sequence1)))
 
     # Return the numerical value of the distance
     return(distance)
@@ -143,22 +139,18 @@ get_K80_distance = function(sequence1, sequence2) {
     S = 0
     V = 0
     
-    for (i in nchar(sequence1)) {
-      if ((substr(sequence1, i,i) == "T" & substr(sequence2, i,i) == "C") | (substr(sequence1, i,i) == "C" || substr(sequence2, i,i) == "T") | 
-          (substr(sequence1, i,i) == "A" & substr(sequence2, i,i) == "G") | (substr(sequence1, i,i) == "G" || substr(sequence2, i,i) == "A")) {
+    for (i in seq(nchar(sequence1))) {
+      if ((substr(sequence1, i,i) == "T" & substr(sequence2, i,i) == "C") | (substr(sequence1, i,i) == "C" & substr(sequence2, i,i) == "T") | 
+          (substr(sequence1, i,i) == "A" & substr(sequence2, i,i) == "G") | (substr(sequence1, i,i) == "G" & substr(sequence2, i,i) == "A")) {
         S = S + 1
       }
-      else if ((substr(sequence1, i,i) == "A" & substr(sequence2, i,i) == "C") | (substr(sequence1, i,i) == "C" || substr(sequence2, i,i) == "A") | 
-          (substr(sequence1, i,i) == "A" & substr(sequence2, i,i) == "T") | (substr(sequence1, i,i) == "T" || substr(sequence2, i,i) == "A") |
-          (substr(sequence1, i,i) == "G" & substr(sequence2, i,i) == "C") | (substr(sequence1, i,i) == "C" || substr(sequence2, i,i) == "G") |
-          (substr(sequence1, i,i) == "G" & substr(sequence2, i,i) == "T") | (substr(sequence1, i,i) == "T" || substr(sequence2, i,i) == "G")) {
+      # All other subsitutions are transversions
+      else if (substr(sequence1, i,i) != substr(sequence2, i,i)) {
         V = V + 1
       }
     }
-    
     S = S / nchar(sequence1)
     V = V / nchar(sequence1)
-    
     distance = -(0.5)*log(1-2*S-V)-0.25*log(1-2*V)
     # Return the numerical value of the distance
     return(distance)
@@ -184,15 +176,17 @@ compute_initial_distance_matrix = function(sequences, distance_measure) {
     colnames(distance_matrix) <- names(sequences)
     
     for (i in seq(N)) {
-      for (j in seq(i,N)) {
-        if (distance_measure == "hamming") {
-          distance_matrix[i, j] = get_hamming_distance(sequences[i], sequences[j])  
-        }
-        if (distance_measure == "JC69") {
-          distance_matrix[i, j] = get_JC69_distance(sequences[i], sequences[j])  
-        }
-        if (distance_measure == "K80") {
-          distance_matrix[i, j] = get_K80_distance(sequences[i], sequences[j])  
+      for (j in seq(N)) {
+        if (i != j) {
+          if (distance_measure == "hamming") {
+            distance_matrix[i, j] = get_hamming_distance(sequences[i], sequences[j])  
+          }
+          if (distance_measure == "JC69") {
+            distance_matrix[i, j] = get_JC69_distance(sequences[i], sequences[j])  
+          }
+          if (distance_measure == "K80") {
+            distance_matrix[i, j] = get_K80_distance(sequences[i], sequences[j])  
+          } 
         }
       }
     }
@@ -207,12 +201,13 @@ get_merge_node_distance = function(node_description, distance_matrix, merging_no
     #    distance_matrix: the matrix of current distances between nodes
     #    merging_nodes: a vector of two node names that are being merged in this step
     #    existing_node: one of the previously existing nodes, not included in the new node
-
-    if (merging_nodes[1] == merging_nodes[2]) {
-      new_distance = distance_matrix[merging_nodes[1], merging_nodes[2]]/2## ADD WEIGHTS
-    } else {
-      new_distance = distance_matrix[merging_nodes[1], existing_node] + distance_matrix[merging_nodes[2], existing_node]/2
-    } 
+  
+    new_distance = ((distance_matrix[merging_nodes[1], existing_node[1]]*node_description[merging_nodes[1],"node_sizes"]) + 
+                      (distance_matrix[merging_nodes[2], existing_node[1]]*node_description[merging_nodes[2],"node_sizes"]))/
+      (node_description[merging_nodes[1],"node_sizes"]+node_description[merging_nodes[2],"node_sizes"]) 
+    
+    # (node_description[merging_nodes[1],"node_sizes"]+node_description[existing_node[1],"node_sizes"]) ## WEIGHTS
+    
     
     # Returns the distance between the newly created merge node and the existing node
     return(new_distance)
@@ -227,26 +222,40 @@ update_distance_matrix = function(node_description, distance_matrix, merging_nod
     # The resulting matrix should be one column and one row smaller, i.e. if the given distance matrix
     # was MxM, then the updated matrix will be M-1xM-1, where the 2 rows and cols represent the separate
     # nodes undergoing the merge are taken out and a new row and col added that represents the new node.
-    
+  
     updated_distance_matrix = matrix(nrow = dim(distance_matrix)[1]-1, ncol = dim(distance_matrix)[1]-1)
     # rownames(updated_distance_matrix) = row.names(node_description)
     # colnames(updated_distance_matrix) = row.names(node_description)
-    # print(length())
-    # 
-    for (i in seq(dim(updated_distance_matrix)[1])) {
-      for (j in seq(dim(updated_distance_matrix)[1])) {
-        if (!(colnames(distance_matrix)[i] %in% merging_nodes & colnames(distance_matrix)[j] %in% merging_nodes)) {
-          print(colnames(distance_matrix)[i])
-          updated_distance_matrix[colnames(distance_matrix)[i], colnames(distance_matrix)[j]] = distance_matrix[colnames(distance_matrix)[i], colnames(distance_matrix)[j]]
-          colnames(updated_distance_matrix)[i] = colnames(distance_matrix)[i]
-          rownames(updated_distance_matrix)[i] = rownames(distance_matrix)[i]
-        }
-      }  
+    colrow_names_updated = 
+    index = 0  
+    for (i in rownames(distance_matrix)) {
+      if (!(i %in% merging_nodes)) {
+        index = index + 1
+        colrow_names_updated[index] = i
+      }
     }
-    print(updated_distance_matrix)
-    print(distance_matrix)
-    # Compute distances to new node
     
+    colrow_names_updated[index+1] = new_node_name
+    
+    rownames(updated_distance_matrix) = colrow_names_updated 
+    colnames(updated_distance_matrix) = colrow_names_updated
+    
+    # Fill existing values
+    for (i in rownames(distance_matrix)){
+      for (j in rownames(distance_matrix)) {
+        if (i != j & !(i %in% merging_nodes) & !(j %in% merging_nodes)) {
+          updated_distance_matrix[i, j] = distance_matrix[i, j] 
+        } 
+        else if (i %in% merging_nodes & !(j %in% merging_nodes)) { 
+          existing_node = j
+          updated_distance_matrix[new_node_name, j] = get_merge_node_distance(node_description, distance_matrix, merging_nodes, existing_node)
+        }
+        else if (j %in% merging_nodes & !(i %in% merging_nodes)) { 
+          existing_node = i
+          updated_distance_matrix[i, new_node_name] = get_merge_node_distance(node_description, distance_matrix, merging_nodes, existing_node)
+        }
+      }
+    }
     
     # Returns the updated matrix of cluster distances
     return(updated_distance_matrix)
@@ -291,8 +300,7 @@ build_upgma_tree = function(sequences, distance_measure) {
     #                      should be used
     N <- length(sequences)
     node_description <- initialize_node_description(sequences)
-    print(node_description
-          )
+    # print(node_description)
     edges <- matrix(nrow = 0, ncol = 2)
     edge_lengths <- vector(mode = "numeric", length = 0)
     
