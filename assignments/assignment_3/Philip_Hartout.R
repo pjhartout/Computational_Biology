@@ -257,6 +257,7 @@ update_distance_matrix = function(node_description, distance_matrix, merging_nod
       }
     }
     
+    diag(updated_distance_matrix) <- Inf
     # Returns the updated matrix of cluster distances
     return(updated_distance_matrix)
 }
@@ -273,13 +274,21 @@ upgma_one_step = function(node_description, distance_matrix, edges, edge_lengths
   
     m1 = rownames(distance_matrix)[which(distance_matrix == min(distance_matrix), arr.ind = TRUE)[1]]
     m2 = colnames(distance_matrix)[which(distance_matrix == min(distance_matrix), arr.ind = TRUE)[2]]
-  
+    
     merging_nodes = c(m1, m2)
-  
-    new_node_name = paste(m1, m2, sep = "")
     
+    node_description = add_new_node(node_description, merging_nodes)
+    new_node_name = node_description$new_node_name
+    node_description = node_description$node_description
+    length_previous_nodes = sum(edge_lengths)/2
+    edges = rbind(edges, c(new_node_name, m1))
+    edges = rbind(edges, c(new_node_name, m2))
+    edge_lengths = c(edge_lengths, distance_matrix[m1, m2]/2)
+    edge_lengths = c(edge_lengths, distance_matrix[m1, m2]/2 - length_previous_nodes)
+    
+    node_description[new_node_name, "node_sizes"] = node_description[m1, "node_sizes"] + node_description[m2, "node_sizes"]
+    node_description[new_node_name, "node_heights"] = max(edge_lengths)
     distance_matrix = update_distance_matrix(node_description, distance_matrix, merging_nodes, new_node_name)
-    
     # Return the updated distance matrix, edge description matrix, edge length vector and 
     # node_description data frame
     #    node_description: data frame containing sizes and heights of all nodes 
@@ -288,6 +297,8 @@ upgma_one_step = function(node_description, distance_matrix, edges, edge_lengths
     #    edges: an Mx2 matrix of pairs of nodes connected by an edge, where the M rows are
     #    the different edges and the 2 columns are the parent node and the child node of an edge.
     #    edge_lengths: a vector of length M of the corresponding edge lengths.
+    print(list(node_description = node_description, distance_matrix = distance_matrix,
+               edges = edges, edge_lengths = edge_lengths))
     return(list(node_description = node_description, distance_matrix = distance_matrix,
                 edges = edges, edge_lengths = edge_lengths))
 }
@@ -300,14 +311,17 @@ build_upgma_tree = function(sequences, distance_measure) {
     #                      should be used
     N <- length(sequences)
     node_description <- initialize_node_description(sequences)
-    # print(node_description)
     edges <- matrix(nrow = 0, ncol = 2)
     edge_lengths <- vector(mode = "numeric", length = 0)
     
     distance_matrix = compute_initial_distance_matrix(sequences, distance_measure)
     
     while (dim(distance_matrix)[1] > 3) {
-      upgma_one_step(node_description, distance_matrix, edges, edge_lengths) 
+      result = upgma_one_step(node_description, distance_matrix, edges, edge_lengths) 
+      edges = result$edges 
+      edge_lengths = result$edge_lengths
+      node_description = result$node_description
+      distance_matrix = result$distance_matrix
     }
   
     # Return the UPGMA tree of sequences
