@@ -280,11 +280,11 @@ upgma_one_step = function(node_description, distance_matrix, edges, edge_lengths
     node_description = add_new_node(node_description, merging_nodes)
     new_node_name = node_description$new_node_name
     node_description = node_description$node_description
-    length_previous_nodes = sum(edge_lengths)/2
     edges = rbind(edges, c(new_node_name, m1))
     edges = rbind(edges, c(new_node_name, m2))
+    
+    edge_lengths = c(edge_lengths, distance_matrix[m1, m2]/2 - max(node_description$node_heights))
     edge_lengths = c(edge_lengths, distance_matrix[m1, m2]/2)
-    edge_lengths = c(edge_lengths, distance_matrix[m1, m2]/2 - length_previous_nodes)
     
     node_description[new_node_name, "node_sizes"] = node_description[m1, "node_sizes"] + node_description[m2, "node_sizes"]
     node_description[new_node_name, "node_heights"] = max(edge_lengths)
@@ -297,8 +297,6 @@ upgma_one_step = function(node_description, distance_matrix, edges, edge_lengths
     #    edges: an Mx2 matrix of pairs of nodes connected by an edge, where the M rows are
     #    the different edges and the 2 columns are the parent node and the child node of an edge.
     #    edge_lengths: a vector of length M of the corresponding edge lengths.
-    print(list(node_description = node_description, distance_matrix = distance_matrix,
-               edges = edges, edge_lengths = edge_lengths))
     return(list(node_description = node_description, distance_matrix = distance_matrix,
                 edges = edges, edge_lengths = edge_lengths))
 }
@@ -316,7 +314,7 @@ build_upgma_tree = function(sequences, distance_measure) {
     
     distance_matrix = compute_initial_distance_matrix(sequences, distance_measure)
     
-    while (dim(distance_matrix)[1] > 3) {
+    while (dim(distance_matrix)[1] > 1) {
       result = upgma_one_step(node_description, distance_matrix, edges, edge_lengths) 
       edges = result$edges 
       edge_lengths = result$edge_lengths
@@ -344,3 +342,4 @@ test_tree_building = function() {
 }
 
 test_tree_building()
+
