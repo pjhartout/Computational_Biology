@@ -1,3 +1,8 @@
+# directories not containing code
+/lectures
+/tutorials
+CB-script-beta.pdf
+
 # History files
 .Rhistory
 .Rapp.history
