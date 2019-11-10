@@ -126,7 +126,7 @@ get_JC69_distance = function(sequence1, sequence2) {
     #    sequence1: first sequence
     #    sequence2: second sequence
 
-    distance = -(3/4)*log(1-(4/3)*(get_hamming_distance(sequence1 = sequence1, sequence2 = sequence2)/nchar(sequence1)))
+    distance = -(3/4)*log(1-(4/3)*(get_hamming_distance(sequence1, sequence2)/nchar(sequence1)))
 
     # Return the numerical value of the distance
     return(distance)
