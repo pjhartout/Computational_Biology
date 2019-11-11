@@ -151,7 +151,7 @@ get_K80_distance = function(sequence1, sequence2) {
     }
     S = S / nchar(sequence1)
     V = V / nchar(sequence1)
-    distance = -(0.5)*log(1-2*S-V)-0.25*log(1-2*V)
+      distance = -(0.5)*log(1-2*S-V)-0.25*log(1-2*V)
     # Return the numerical value of the distance
     return(distance)
 }
