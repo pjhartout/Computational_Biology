@@ -80,8 +80,14 @@ create_TN93_Q_matrix = function(pi, alpha1, alpha2, beta) {
     #   alpha2: rate coefficient for the A <-> G transition
     #   beta: rate coefficient for transversions
 
-    # ???
-
+    Q = matrix(c(-(alpha1*pi[2] + beta*pi[3] + beta*pi[4]), alpha1*pi[2], beta*pi[3], beta*pi[4],
+               alpha1*pi[1], -(alpha1*pi[1] + beta*pi[3] + beta*pi[4]), beta*pi[3], beta*pi[4],
+               beta*pi[1], beta*pi[2], -(beta*pi[1] + beta*pi[2] + alpha2*pi[4]), alpha2*pi[4],
+               beta*pi[1], beta*pi[2], alpha2*pi[3], -(beta*pi[1] + beta*pi[2] + alpha2*pi[3])), 
+               nrow=4,              # number of rows 
+               ncol=4,              # number of columns 
+               byrow = TRUE)       # fill matrix by rows 
+  
     # Return the transition rate matrix
     # Q: 4 by 4 matrix of rates
     return(Q)
@@ -99,8 +105,23 @@ calculate_likelihood_from_subtree_likelihoods = function(N, Q,
     #   subtree2_likelihood: an N by 4 matrix containing the per site per nucleotide likelihoods
     #                        at the second child node
     #   subtree2_branch_length: the length of the branch leading to the second child node
-
-    # ???
+    
+    probability_matrix_1 = expm(subtree1_branch_length*Q)
+    probability_matrix_2 = expm(subtree2_branch_length*Q)
+    
+    likelihood_per_site = matrix(nrow = N, ncol = 4)
+    
+    for (i in seq(N)) {
+      for (j in seq(4)) {
+        likelihood_site_1 = 0
+        likelihood_site_2 = 0
+        for (k in seq(4)) {
+          likelihood_site_1 = likelihood_site_1 + probability_matrix_1[j,k] * subtree1_likelihood[i, k]
+          likelihood_site_2 = likelihood_site_2 + probability_matrix_2[j,k] * subtree2_likelihood[i, k]
+        }
+        likelihood_per_site[i, j] = likelihood_site_1 * likelihood_site_2
+      } 
+    }
 
     # Return the per site nucleotide likelihoods on the internal node.
     #   likelihood_per_site: an N by 4 matrix representing the nucleotide likelihoods per site
@@ -115,8 +136,23 @@ get_likelihood_from_sequence = function(N, sequence) {
     # the nucleotide at this site and 0 in all other columns.
     #   N: number of sites in the alignment
     #   sequence: the sequence at the tip, encoded as a vector of nucleotide numeric values.
-
-    # ???
+  
+    likelihood_per_site = matrix(0, nrow = N, ncol = 4)
+  
+    for (i in seq(N)) {
+      if (sequence[i] == 1) {
+        likelihood_per_site[i, 1] = 1
+      }
+      else if (sequence[i] == 2) {
+        likelihood_per_site[i, 2] = 1
+      }
+      else if (sequence[i] == 3) {
+        likelihood_per_site[i, 3] = 1
+      }
+      else if (sequence[i] == 4) {
+        likelihood_per_site[i, 4] = 1
+      }
+    }
 
     # Return the per site nucleotide likelihoods at the tip.
     #   likelihood_per_site: an N by 4 matrix representing the nucleotide likelihoods per site
@@ -139,15 +175,21 @@ get_subtree_likelihood = function(node, tree, sequences, Q) {
     #   Q: the substitution rate matrix
 
     N = nchar(sequences[[1]])
-
     if (node <= length(tree$tip.label)) {
         # node is a tip: compute the likelihood for each site and each nucleotide on this node
-
-        # ???
+        sequence_at_tip = get_sequence_at_tip_node(node, tree, sequences)
+        likelihood_per_site = get_likelihood_from_sequence(N, sequence_at_tip)
+        
     } else {
         # node is an internal node: compute the likelihood for each site and each nucleotide on this node
-
-        # ???
+      
+        node_children_information = get_node_children(node, tree)
+        
+        subtree1 = get_subtree_likelihood(unlist(node_children_information["child1"]), tree, sequences, Q)
+        subtree2 = get_subtree_likelihood(unlist(node_children_information["child2"]), tree, sequences, Q)  
+        
+        likelihood_per_site = calculate_likelihood_from_subtree_likelihoods(N, Q, subtree1, unlist(node_children_information["branch_length1"]),
+                                                                            subtree2, unlist(node_children_information["branch_length2"]))
     }
 
     # Return the per site nucleotide likelihoods at this node.
@@ -174,14 +216,21 @@ Felstensteins_pruning_loglikelihood = function(pi, alpha1, alpha2, beta, newick_
     N = nchar(sequences[[1]])
 
     # Initialize the Q matrix
-    # ???
+    Q = create_TN93_Q_matrix(pi, alpha1, alpha2, beta)
     
     # Compute the likelihoods per site of the tree starting from the root
     root = length(tree$tip.label) + 1
     likelihood_per_site = get_subtree_likelihood(root, tree, sequences, Q)
     
     # Sum up the log likelihoods of each site
-    # ???
+    loglikelihood = 0
+    for (i in seq(N)) {
+      L = 0
+      for (j in seq(4)) {
+        L = L + pi[j]* likelihood_per_site[i,j]
+      }
+      loglikelihood = loglikelihood + log(L)
+    }
 
     # Return the final log likelihood of the alignment on the given tree, a single number computed of the 
     # per site per nucleotide likelihoods at the root of the tree.
