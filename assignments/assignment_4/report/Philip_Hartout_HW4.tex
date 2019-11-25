@@ -1,0 +1,76 @@
+\documentclass[a4paper,10pt,twoside]{article}
+\usepackage{bera}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[T1]{fontenc}
+\usepackage[utf8x]{inputenc}
+\usepackage[english]{babel} 
+\usepackage[usenames,dvipsnames,figures]{xcolor}
+\usepackage{lmodern,tikz,makeidx,graphicx,eurosym,amsmath,comment,titlesec,subcaption,textgreek,multirow,hyperref,url,enumerate,chemfig,sectsty,mathrsfs,amssymb,amsthm,multicol,fancyhdr,setspace,indentfirst,multicol,gensymb,textcomp, booktabs}
+\usepackage[neverdecrease]{paralist}
+\usepackage[final]{pdfpages}
+\usepackage[top=3cm, bottom=3cm, left=3cm, right=3cm]{geometry}
+
+\hypersetup{
+    colorlinks=false,       % false: boxed links; true: colored links
+    linkcolor=black,          % color of internal links (change box color with linkbordercolor)
+    citecolor=black,        % color of links to bibliography
+    filecolor=black,      % color of file links
+    urlcolor=black           % color of external links
+}
+
+\setlength\columnsep{26pt}
+
+\pagestyle{fancy}
+\setlength{\headheight}{25pt} 
+\lhead{Philip Hartout}
+\rhead{Computational Biology Assignment 3}
+\rfoot{}
+
+\setlength\columnsep{26pt}
+
+\hypersetup{
+        linkcolor=blue,  
+        colorlinks=true,
+        citecolor=blue,   
+        urlcolor=black,
+}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} 
+\newlength{\drop}
+
+
+\title{Computational Biology \\ Assignment 4 - Report}
+\author{Philip Hartout \\ \url{phartout@student.ethz.ch}}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{enumerate}
+   \item There is one reason why there are two different probabilities at node 6 for A and G, namely that A has occurred once in the sequence and G has not occurred in the sequence, hence increasing the likelihood of A.
+   \item The likelihoods of the subtree under the node that is interchanged is not going to be influenced by the calculations, because the sequence remains the same, as does the tree structure. Also, given K80 is time-reversible, the root of the tree will have the same likelihood, and the calculations leading to the root tree will not have to be changed.
+   \item Three differences are:
+   \begin{enumerate}
+       \item UPGMA have more stringent assumptions than Maximum likelihood methods, for instance, it assumes the presence of a strict molecular clock, which is often violated.
+       \item UPGMA is only valid for ultrametric trees, which means it can only be made from sequences sampled at one point in time.
+       \item UPGMA makes use of distance metrics between data points, whereas maximum likelihood-based trees make use of an evolutionary model.
+       \item UPGMA is greedy, whereas Maximum Likelihood guarantees to find an optimal solution.
+   \end{enumerate}
+   \item The running time would still be in $\mathcal{O}(n)$, because summing over five states twice is still accomplished in constant time.
+   \item We cannot place the root anywhere in the tree and still obtain the same likelihood if the substitution model is not time reversible, because, suppose the likelihood of the tree starting in root $D_1$ is provided by:
+   \begin{equation*}
+        P(D_1) = \sum_{X\in \mathcal{N}} \pi_{X}p_{X,s_1}(t_1)
+   \end{equation*}
+   where $s_i\in \mathcal{N}=\left\{T,C,A,G\right\}$.
+   We would then require the equality $p_{X,s_2}(t_2+t_3)$ to equate $P(D_1)$ to $P(D_2)$, as provided below:
+   \begin{align*}
+       P(D_1) &= \sum_{X\in \mathcal{N}} \pi_{X}p_{X,s_1}(t_1) \sum_{Y\in \mathcal{N}} p_{X,Y}(t_2)p_{Y,s_2}(t_3) \\
+       &= \sum_{X\in \mathcal{N}}\sum_{Y\in \mathcal{N}}\pi_{X}p_{X,s_1}(t_1)p_{X,Y}(t_2)p_{Y, s_2}(t_3)\\
+       &= \sum_{X\in \mathcal{N}}\sum_{Y\in \mathcal{N}}\pi_{X}p_{X,Y}(t_2)p_{X,s1}(t_1)p_{Y, s_2}(t_3)\\
+       & \neq P(D_2)
+   \end{align*}
+
+\end{enumerate}
+
+\end{document}
