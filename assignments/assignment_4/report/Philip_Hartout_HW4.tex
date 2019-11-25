@@ -23,7 +23,7 @@
 \pagestyle{fancy}
 \setlength{\headheight}{25pt} 
 \lhead{Philip Hartout}
-\rhead{Computational Biology Assignment 3}
+\rhead{Computational Biology Assignment 4}
 \rfoot{}
 
 \setlength\columnsep{26pt}
@@ -55,7 +55,7 @@
        \item UPGMA have more stringent assumptions than Maximum likelihood methods, for instance, it assumes the presence of a strict molecular clock, which is often violated.
        \item UPGMA is only valid for ultrametric trees, which means it can only be made from sequences sampled at one point in time.
        \item UPGMA makes use of distance metrics between data points, whereas maximum likelihood-based trees make use of an evolutionary model.
-       \item UPGMA is greedy, whereas Maximum Likelihood guarantees to find an optimal solution.
+       \item UPGMA is a greedy algorithm, whereas Maximum Likelihood guarantees to find an optimal solution.
    \end{enumerate}
    \item The running time would still be in $\mathcal{O}(n)$, because summing over five states twice is still accomplished in constant time.
    \item We cannot place the root anywhere in the tree and still obtain the same likelihood if the substitution model is not time reversible, because, suppose the likelihood of the tree starting in root $D_1$ is provided by:
