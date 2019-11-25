@@ -48,13 +48,14 @@
 \maketitle
 
 \begin{enumerate}
-   \item There is one reason why there are two different probabilities at node 6 for A and G, namely that A has occurred once in the sequence, hence increasing its likelihood.
+   \item There is one reason why there are two different probabilities at node 6 for A and G, namely that A has occurred once in the sequence and G has not occurred in the sequence, hence increasing the likelihood of A.
    \item The likelihoods of the subtree under the node that is interchanged is not going to be influenced by the calculations, because the sequence remains the same, as does the tree structure. Also, given K80 is time-reversible, the root of the tree will have the same likelihood, and the calculations leading to the root tree will not have to be changed.
    \item Three differences are:
    \begin{enumerate}
        \item UPGMA have more stringent assumptions than Maximum likelihood methods, for instance, it assumes the presence of a strict molecular clock, which is often violated.
        \item UPGMA is only valid for ultrametric trees, which means it can only be made from sequences sampled at one point in time.
        \item UPGMA makes use of distance metrics between data points, whereas maximum likelihood-based trees make use of an evolutionary model.
+       \item UPGMA is greedy, whereas Maximum Likelihood guarantees to find an optimal solution.
    \end{enumerate}
    \item The running time would still be in $\mathcal{O}(n)$, because summing over five states twice is still accomplished in constant time.
    \item We cannot place the root anywhere in the tree and still obtain the same likelihood if the substitution model is not time reversible, because, suppose the likelihood of the tree starting in root $D_1$ is provided by:
@@ -66,7 +67,7 @@
    \begin{align*}
        P(D_1) &= \sum_{X\in \mathcal{N}} \pi_{X}p_{X,s_1}(t_1) \sum_{Y\in \mathcal{N}} p_{X,Y}(t_2)p_{Y,s_2}(t_3) \\
        &= \sum_{X\in \mathcal{N}}\sum_{Y\in \mathcal{N}}\pi_{X}p_{X,s_1}(t_1)p_{X,Y}(t_2)p_{Y, s_2}(t_3)\\
-       &= \sum_{X\in \mathcal{N}}\sum_{Y\in \mathcal{N}}\pi_{X}p_{X,Y}(t_2)p_{X,s1}(t_1)p_{Y, s_2}(t_3)
+       &= \sum_{X\in \mathcal{N}}\sum_{Y\in \mathcal{N}}\pi_{X}p_{X,Y}(t_2)p_{X,s1}(t_1)p_{Y, s_2}(t_3)\\
        & \neq P(D_2)
    \end{align*}
 
