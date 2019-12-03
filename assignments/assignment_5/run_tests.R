@@ -1,5 +1,4 @@
-tests_dir <- "/path/to/tests"
-if(tests_dir == "path/to/tests") stop("tests_dir needs to be set to a proper path")
+tests_dir <- "/home/pjhartout/Polybox/ETHZ/Semester_1/Computational_Biology/assignments/assignment_5/student_test_suite/"
 
 library("RUnit")
 
