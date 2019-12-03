@@ -141,8 +141,15 @@ linear_regression = function(values1, values2) {
     #   values1: first ordered vector of values
     #   values2: second ordered vector of values
 
-    # ???
-
+    lr <- lm(values2 ~ values1)
+    #print(summary(lr))
+    slope = coef(lr)[["values1"]]
+    intercept = coef(lr)[["(Intercept)"]]
+    f = summary(lr)$fstatistic
+    R2 = summary(lr)$r.squared
+    p.value = pf(f[1],f[2],f[3],lower.tail=F)[["value"]]
+    
+    
     # Return a vector with named values that summarizes the linear regression result.
     #   slope: the slope of the linear regression line (beta)
     #   intercept: the intercept of the linear regression line (alpha)
@@ -158,8 +165,8 @@ calculate_trait_at_internal_node = function(trait_child1, trait_child2, branch_l
     #   trait_child2: trait value at second child
     #   branch_length_to_child1: branch length leading to first child
     #   branch_length_to_child2: branch length leading to second child
-
-    # ???
+    sum_of_lengths = branch_length_to_child2+branch_length_to_child1
+    trait_at_internal_node = trait_child1 * (branch_length_to_child2/sum_of_lengths) + trait_child2 * (branch_length_to_child1/sum_of_lengths)
 
     # Return the estimated value of the trait at the internal node.
     return(trait_at_internal_node)
@@ -173,7 +180,7 @@ calculate_contrast = function(trait_child1, trait_child2, branch_length_to_child
     #   branch_length_to_child1: branch length leading to first child
     #   branch_length_to_child2: branch length leading to second child
 
-    # ???
+    contrast = (trait_child1 - trait_child2)/(sqrt(branch_length_to_child1+branch_length_to_child2))
 
     # Return the numerical value of the normalized contrast.
     return(contrast)
@@ -186,8 +193,12 @@ calculate_corrected_branch_length = function(node, child1, child2, corrected_bra
     #   child2: the second child of the given node
     #   corrected_branch_lengths: the current vector of corrected branch lengths, where all branches
     #                             below the given node have already been corrected
-
-    # ???
+    
+    t_i = corrected_branch_lengths[child1]
+    t_l = corrected_branch_lengths[child2]
+    t_k = corrected_branch_lengths[node]
+    
+    corrected_length = (t_i*t_l)/(t_i+t_l) + t_k
 
     # Return the numerical value of the corrected branch length
     return(corrected_length)
@@ -200,9 +211,9 @@ calculate_trait_and_contrast = function(child1, child2, traits, corrected_branch
     #   traits: a vector containing trait values for all nodes
     #   corrected_branch_lengths: the current vector of corrected branch lengths, where all branches
     #                             below the node in question have already been corrected
+    trait_value = calculate_trait_at_internal_node(traits[child1], traits[child2], corrected_branch_lengths[child1], corrected_branch_lengths[child2])
 
-    # ???
-
+    contrast = calculate_contrast(traits[child1], traits[child2], corrected_branch_lengths[child1], corrected_branch_lengths[child2])
     # Return the trait value and the normalized contrast value at the given node.
     #   trait_value: the numerical value for the trait at given node
     #   contrast: the numerical value for the contrast at given node
@@ -221,18 +232,45 @@ get_contrasts_in_subtree = function(node, tree, description) {
     #				 This list is initialized by the provided function initialize_description().
 
     # If the node is a tip, return the same description.
-    # ???
-
-    # Otherwise, get the child nodes of the given node and compute the corrected branch lengths, normalized contrasts and trait values
-    # for the child nodes, saving the updated description.
-    # ???
-
-    # Update the branch length leading to the given node, save it in the description
-    # ???
-
-    # Compute the trait values and normalized contrasts for both traits, save the values in the description
-    # ???
-
+    if (is_tip(node, tree) == T) {
+      updated_description = description
+      return(updated_description)
+    }
+    else {
+      # Otherwise, get the child nodes of the given node and compute the corrected branch lengths, normalized contrasts and trait values
+      updated_description = description
+      children = get_node_children(node, tree)
+      child1 = children$child1
+      child2 = children$child2
+  
+      updated_description = get_contrasts_in_subtree(child1, tree, updated_description)
+      updated_description = get_contrasts_in_subtree(child2, tree, updated_description)
+      
+      # Update the branch length leading to the given node, save it in the description
+      corrected_branch_length = calculate_corrected_branch_length(node, child1, child2, updated_description[["corrected_branch_lengths"]])
+      updated_description$corrected_branch_lengths[node] = corrected_branch_length
+      corrected_branch_lengths = updated_description$corrected_branch_lengths
+      # Compute the trait values and normalized contrasts for both traits, save the values in the description
+      # Extract traits and branch lengths
+      traits = updated_description[["traits"]]
+      
+      trait_and_contrast_1 = calculate_trait_and_contrast(child1, child2, as.vector(traits[,"value_of_trait1"]), corrected_branch_lengths)
+      trait_value_1 = trait_and_contrast_1[["trait_value"]]
+      contrast_1 = trait_and_contrast_1[["contrast"]]
+      
+      trait_and_contrast_2 = calculate_trait_and_contrast(child1, child2, as.vector(traits[,"value_of_trait2"]), corrected_branch_lengths)
+      trait_value_2 = trait_and_contrast_2[["trait_value"]]
+      contrast_2 = trait_and_contrast_2[["contrast"]]
+      #print(updated_description$traits)
+      #print(updated_description$normalized_contrasts)
+      #print(updated_description$corrected_branch_lengths)
+      
+      updated_description$traits[node, "value_of_trait1"] = trait_value_1
+      updated_description$normalized_contrasts[node, "normalized_contrast_trait1"] = contrast_1
+      
+      updated_description$traits[node, "value_of_trait2"] = trait_value_2
+      updated_description$normalized_contrasts[node, "normalized_contrast_trait2"] = contrast_2
+    }
     # Return a list with updated trait values, normalized contrasts, and corrected branch lenghts.
     #   updated_description: list with structure as defined in the initialize_description() function.
     return(updated_description)
@@ -251,21 +289,27 @@ get_trait_correlation = function(newick_tree, traits_at_tip) {
     tree = reorder(tree, order = "cladewise")
 
     # Initialize the list of traits, contrasts and branch lengths
-    # ???
+    description = initialize_description(tree, traits_at_tip)
 
     # Calculate the new trait values at all the nodes in the tree, normalized contrasts at the internal nodes and the
     # corrected branch lengths, starting at the root of the tree.
-    # ???
+    root = get_root(tree)
+    
+    updated_description = get_contrasts_in_subtree(root, tree, description)
 
     # Perform linear regression on the traits at the tips and get the slope, intercept, P-value, and R2-value
-    # ???
+    raw_data_regression = linear_regression(as.vector(traits_at_tip$trait1), as.vector(traits_at_tip$trait2))
 
     # Perform linear regression on the normalized contrasts and get the slope, intercept, P-value, and R2-value
-    # ???
+    normalized_contrast_trait1 = as.vector(updated_description$normalized_contrasts[,"normalized_contrast_trait1"])
+    normalized_contrast_trait2 = as.vector(updated_description$normalized_contrasts[,"normalized_contrast_trait2"])
+    contrasts_regression = linear_regression(normalized_contrast_trait1[!is.na(normalized_contrast_trait1)], 
+                                             normalized_contrast_trait2[!is.na(normalized_contrast_trait2)])
 
     # Plot the two linear regression results
     summary_linear_regression <- list(linear_regression_raw_data = raw_data_regression,
                                       linear_regression_contrasts = contrasts_regression)
+    
     plot_data_and_regression(tree, updated_description, summary_linear_regression)
 
     return(summary_linear_regression)
@@ -281,4 +325,5 @@ test_trait_correlation = function() {
   print(get_trait_correlation(newick_tree, traits_at_tip))
 }
 
-# test_trait_correlation()
+test_trait_correlation()
+
