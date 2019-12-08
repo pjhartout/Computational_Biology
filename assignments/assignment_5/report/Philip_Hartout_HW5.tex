@@ -49,10 +49,10 @@
 
 \begin{enumerate}
     \item Fisher's exact test cannot be used to check for the correlation of discrete traits at the tips of a phylogenetic tree because it does not take into account the phylogenetic relatedness. 
-    \item The contrasts $Z_k$ are mutually independent because they are computed using independent parts of the evolutionary tree. They have the same variance because they are all ``normalized'' by dividing the contrasts by $\sqrt{t_i'+t_l'}$
-    \item Calculating the contrasts $n-1$ in the tree focuses on defining a set of independent variables. Dividing the contrast value by the corrected branch length multiplied by the variance of the underlying Brownian underlying the evolutionary model which ensures that they have identical variance. 
-    \item The two traits will show a correlation if they appear to be correlated in the experimental data regardless of evolutionary history. They would show correlated normalized contrast if the individuals do not share an evolutionary history but still evolved two traits which seem to be correlated according to the observations.
-    \item This strategy does not account for the branch length that exists between individuals, hence does not allow a full appreciation of the evolutionary distance between individuals. 
+    \item The contrasts $Z_k$ are mutually independent because they are computed using independent parts of the evolutionary tree. They have the same variance because they are all ``normalized'' by dividing the contrasts by $\sqrt{t_i'+t_l'}$.
+    \item Calculating the $n-1$ contrasts in the tree focuses on defining a set of independent variables. Dividing the contrast value by the corrected branch length multiplied by the variance of the underlying Brownian evolutionary model which ensures that they have identical variance. 
+    \item The two traits will show a correlation if they appear to be correlated in the experimental data regardless of evolutionary history. They would show correlated normalized contrast if the individuals do not share an evolutionary history that can explain the correlation observed in the data but still evolved two traits which seem to be correlated according to the observations.
+    \item This strategy does not account for the branch length that exists between individuals, hence does not allow a full appreciation of the evolutionary distance between individuals and does not accurately correct for the evolutionary patterns observed between individual should there be inhomogeneities in distances. 
 \end{enumerate}
 
 \end{document}
